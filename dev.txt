@@ -1,0 +1,10 @@
+-r req.txt
+
+black
+python-language-server
+pytest
+pytest-watch
+pytest-picked
+mypy
+pytest-mypy
+sqlalchemy-stubs
