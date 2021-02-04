@@ -87,8 +87,11 @@ def producer():
         msg = Message(dict(attr=idx))
         session.add(msg)
         session.commit()
+        # Queue length monitoring -> send to datadog
         print("." * next(session.execute("select count(*) from outbox"))[0])
         if idx % 5 == 0:
+            # prune messages that have been processed
+            # could be in another process or regular job
             session.execute(
                 _sa.delete(
                     outbox_table,
@@ -142,6 +145,7 @@ def processable_messages(session, component_name):
             _time.sleep(backoff)
 
 
+# Message handling needs to be idempotent
 def _handle(session, msg):
     fail = random.random() < 0.2
     print(msg, "!" if fail else "")

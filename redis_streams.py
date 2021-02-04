@@ -17,6 +17,8 @@ A message that consumer A has read will not be read by consumers B,C,...
 Re-process messages when consumers fail
 If a consumer fails before acknowledging the successful processing of a message,
 the message will be re-processed by another worker after a time-out (2.5 sec here).
+(the timeout needs to be high enough so that max processing time is always lower
+than the timeout)
 => at least once semantics
 
 Pruning
@@ -57,6 +59,7 @@ def producer():
     while True:
         idx += 1
         stream.add({"msg": idx})
+        # Queue length monitoring -> send to datadog
         print("." * db.xlen(STREAM_NAME))
         time.sleep(0.4)
         if idx % 5 == 0:
@@ -100,7 +103,7 @@ def consumer():
     cons = db.consumer_group("con-grp", stream_names, consumer=consumer_name)
     cons.create()
     while True:
-        # get & process un-ack'd messages
+        # get & process un-ack'd messages that have been idle for 2.5s
         for stream_key in stream_names:
             stream = getattr(cons, stream_key)
             # if walrus would support XAUTOCLAIM this would be simpler :-)
