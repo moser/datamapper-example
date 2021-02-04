@@ -1,3 +1,5 @@
 sqlalchemy ~= 1.4b1
 pydantic
 inflection
+psycopg2-binary
+walrus
