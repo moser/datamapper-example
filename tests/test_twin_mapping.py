@@ -195,4 +195,3 @@ def test_works():
     dog = session.query(DomainDog).first()
     print(dog)
     print(session.to_domain(dog))
-    raise
